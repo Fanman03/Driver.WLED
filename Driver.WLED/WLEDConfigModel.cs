@@ -9,7 +9,7 @@ namespace Driver.WLED
 {
     public class WLEDConfigModel : SLSConfigData
     {
-        private string ip = "10.0.0.200";
+        private string ip = "0.0.0.0";
         public string IP
         {
             get => ip;
