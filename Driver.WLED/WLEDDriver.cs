@@ -119,7 +119,7 @@ namespace Driver.WLED
 
         public void PutConfig<T>(T config) where T : SLSConfigData
         {
-            WLEDConfigModel proxy = config as WLEDConfigModel;
+            this.configModel = config as WLEDConfigModel;
         }
 
         public UserControl GetCustomConfig(ControlDevice controlDevice)
