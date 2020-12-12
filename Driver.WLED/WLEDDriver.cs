@@ -77,7 +77,7 @@ namespace Driver.WLED
                 Id = Guid.Parse("c7204793-c45a-4b8f-8290-56e66e4861a7"),
                 Author = "Fanman03",
                 Blurb = "Driver for controlling WLED controllers. WLED controller software by Aircoookie.",
-                CurrentVersion = new ReleaseNumber(1, 0, 0, 2),
+                CurrentVersion = new ReleaseNumber(1, 0, 0, 3),
                 GitHubLink = "https://github.com/SimpleLed/Driver.WLED",
                 IsPublicRelease = false,
             };
@@ -152,6 +152,11 @@ namespace Driver.WLED
             }
 
             wled.LEDs = deviceLeds.ToArray();
+        }
+
+        public void SetColorProfile(ColorProfile value)
+        {
+
         }
 
         public class WLEDControlDevice : ControlDevice
