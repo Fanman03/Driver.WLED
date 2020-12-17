@@ -29,7 +29,7 @@ namespace Driver.WLED
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            WledDriver.configModel.NewController();
+            WledDriver.AddController(WledDriver.configModel.NewController(IPBox.Text));
         }
     }
 }

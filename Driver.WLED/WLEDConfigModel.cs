@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -11,17 +13,18 @@ namespace Driver.WLED
 {
     public class WLEDConfigModel : SLSConfigData
     {
-        public void NewController()
+        public WLEDController NewController(string IP)
         {
-            Controllers.Add(new WLEDController() { IP = "6.9.6.9", Port = "21324" });
+            WLEDController newController = new WLEDController() {IP = IP, Port = "21324"};
+            Controllers.Add(newController);
+            OnPropertyChanged("Controllers");
+            DataIsDirty = true;
+            return newController;
         }
 
-        private List<WLEDController> controllers = new List<WLEDController>()
-        {
-            new WLEDController() {IP = "10.0.0.200", Port = "21324"}
-        };
+        private ObservableCollection<WLEDController> controllers = new ObservableCollection<WLEDController>() {};
 
-        public List<WLEDController> Controllers
+        public ObservableCollection<WLEDController> Controllers
         {
             get => controllers;
             set
@@ -43,7 +46,7 @@ namespace Driver.WLED
                     try
                     {
                         string jsonString;
-                        using (var wc = new System.Net.WebClient())
+                        using (var wc = new QuickClient())
                             jsonString = wc.DownloadString("http://" + IP + "/json/info");
                         var response = JsonConvert.DeserializeObject<WLEDApiInfo>(jsonString);
                         return response.leds.count;
@@ -54,9 +57,8 @@ namespace Driver.WLED
                     }
 
                 }
-                set
+                private set
                 {
-                    LedCount = value;
                 }
             }
 
@@ -67,7 +69,7 @@ namespace Driver.WLED
                     try
                     {
                         string jsonString;
-                        using (var wc = new System.Net.WebClient())
+                        using (var wc = new QuickClient())
                             jsonString = wc.DownloadString("http://" + IP + "/json/info");
                         var response = JsonConvert.DeserializeObject<WLEDApiInfo>(jsonString);
                         return response.name;
@@ -78,9 +80,8 @@ namespace Driver.WLED
                     }
 
                 }
-                set
+                private set
                 {
-                    Name = value;
                 }
             }
         }
@@ -137,6 +138,16 @@ namespace Driver.WLED
             public int u { get; set; }
             public int t { get; set; }
             public int pmt { get; set; }
+        }
+
+        private class QuickClient : WebClient
+        {
+            protected override WebRequest GetWebRequest(Uri uri)
+            {
+                WebRequest w = base.GetWebRequest(uri);
+                w.Timeout = (int) TimeSpan.FromSeconds(2).TotalMilliseconds;
+                return w;
+            }
         }
     }
 }

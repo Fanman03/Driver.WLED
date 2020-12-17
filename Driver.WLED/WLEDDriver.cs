@@ -29,27 +29,34 @@ namespace Driver.WLED
         {
             foreach (WLEDConfigModel.WLEDController controller in configModel.Controllers)
             {
-                WLEDControlDevice wled = new WLEDControlDevice();
-                wled.Name = controller.Name;
-                wled.DeviceType = DeviceTypes.LedStrip;
-                wled.Driver = this;
-                wled.Has2DSupport = false;
-                wled.ProductImage = (Bitmap)System.Drawing.Image.FromStream(imageStream);
-                wled.LedCount = controller.LedCount;
-                wled.Endpoint = new IPEndPoint(IPAddress.Parse(controller.IP), Int32.Parse(controller.Port));
-
-                List<ControlDevice.LedUnit> deviceLeds = new List<ControlDevice.LedUnit>();
-                for (int i = 0; i < controller.LedCount; i++)
-                {
-                    ControlDevice.LedUnit newLed = new ControlDevice.LedUnit();
-                    newLed.Data = new ControlDevice.LEDData();
-                    newLed.Data.LEDNumber = i;
-                    deviceLeds.Add(newLed);
-                }
-
-                wled.LEDs = deviceLeds.ToArray();
-                DeviceAdded?.Invoke(wled, new Events.DeviceChangeEventArgs(wled));
+                AddController(controller);
             }
+        }
+
+        public void AddController(WLEDConfigModel.WLEDController controller)
+        {
+            WLEDControlDevice wled = new WLEDControlDevice();
+            wled.Name = controller.Name;
+            wled.DeviceType = DeviceTypes.LedStrip;
+            wled.Driver = this;
+            wled.Has2DSupport = false;
+            wled.ProductImage = (Bitmap)System.Drawing.Image.FromStream(imageStream);
+            wled.LedCount = controller.LedCount;
+            wled.Endpoint = new IPEndPoint(IPAddress.Parse(controller.IP), Int32.Parse(controller.Port));
+
+            List<ControlDevice.LedUnit> deviceLeds = new List<ControlDevice.LedUnit>();
+            for (int i = 0; i < controller.LedCount; i++)
+            {
+                ControlDevice.LedUnit newLed = new ControlDevice.LedUnit();
+                newLed.Data = new ControlDevice.LEDData();
+                newLed.Data.LEDNumber = i;
+                deviceLeds.Add(newLed);
+            }
+
+            wled.LEDs = deviceLeds.ToArray();
+            DeviceAdded?.Invoke(wled, new Events.DeviceChangeEventArgs(wled));
+            var helloWorld = new List<byte>() { 0x02, 0xFF, 0x00, 0xFF, 0x00 };
+            wled.Socket.SendTo(helloWorld.ToArray(), wled.Endpoint);
         }
 
         public void Dispose()
