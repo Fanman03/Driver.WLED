@@ -6,27 +6,40 @@
              xmlns:local="clr-namespace:Driver.WLED"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Margin="10" HorizontalAlignment="Center">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"></RowDefinition>
-            <RowDefinition Height="35"></RowDefinition>
-            <RowDefinition Height="25"></RowDefinition>
-            <RowDefinition Height="35"></RowDefinition>
-            <RowDefinition Height="25"></RowDefinition>
-            <RowDefinition Height="35"></RowDefinition>
-            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="210"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Label >IP Address</Label>
-        <TextBox Grid.Row="1" Width="200" Height="30" Text="{Binding IP}"></TextBox>
-        <Label Grid.Row="2">Port</Label>
-        <TextBox Grid.Row="3" Width="200" Height="30" Text="{Binding Port}"></TextBox>
-        <Label Grid.Row="4">Number of LEDs</Label>
-        <StackPanel Grid.Row="5" Orientation="Horizontal">
-            <Slider Width="190"  Minimum="1" Maximum="490" Value="{Binding LedCount}"></Slider>
-            <Label Content="{Binding LedCount}"></Label>
-        </StackPanel>
+        <ListView ItemsSource="{Binding Controllers}">
+        <ListView.ItemTemplate>
+            <DataTemplate>
+            <Grid Margin="10" HorizontalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"></RowDefinition>
+                    <RowDefinition Height="35"></RowDefinition>
+                    <RowDefinition Height="25"></RowDefinition>
+                    <RowDefinition Height="35"></RowDefinition>
+                    <RowDefinition Height="25"></RowDefinition>
+                    <RowDefinition Height="35"></RowDefinition>
+                    <RowDefinition Height="35"></RowDefinition>
+                    <RowDefinition Height="35"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="210"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label >IP Address</Label>
+                <TextBox Grid.Row="1" Width="200" Height="30" Text="{Binding IP}"></TextBox>
+                <Label Grid.Row="2">Port</Label>
+                <TextBox Grid.Row="3" Width="200" Height="30" Text="{Binding Port}"></TextBox>
+                <Label Grid.Row="4">Number of LEDs</Label>
+                <Label Grid.Row="5" Content="{Binding LedCount}"></Label>
+                <Label Grid.Row="6">Device Name</Label>
+                <Label Grid.Row="7" Content="{Binding Name}"></Label>
+            </Grid>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+        <Button Grid.Row="1" Width="100" Click="ButtonBase_OnClick">Add Controller</Button>
     </Grid>
 </UserControl>

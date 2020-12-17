@@ -6,10 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using Newtonsoft.Json;
 using SimpleLed;
@@ -24,34 +20,36 @@ namespace Driver.WLED
         [JsonIgnore]
         public WLEDConfigModel configModel = new WLEDConfigModel();
 
-        public Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
         public static Assembly assembly = Assembly.GetExecutingAssembly();
         public static Stream imageStream = assembly.GetManifestResourceStream("Driver.WLED.WLED.png");
 
-        public static WLEDControlDevice wled = new WLEDControlDevice();
+
         
         public void Configure(DriverDetails driverDetails)
         {
-            wled.Name = "WLED";
-            wled.DeviceType = DeviceTypes.LedStrip;
-            wled.Driver = this;
-            wled.Has2DSupport = false;
-            wled.ProductImage = (Bitmap) System.Drawing.Image.FromStream(imageStream);
-            wled.LedCount = configModel.LedCount;
-            wled.Endpoint = new IPEndPoint(IPAddress.Parse(configModel.IP), Int32.Parse(configModel.Port));
-
-            List <ControlDevice.LedUnit> deviceLeds = new List<ControlDevice.LedUnit>();
-            for (int i = 0; i < configModel.LedCount; i++)
+            foreach (WLEDConfigModel.WLEDController controller in configModel.Controllers)
             {
-                ControlDevice.LedUnit newLed = new ControlDevice.LedUnit();
-                newLed.Data = new ControlDevice.LEDData();
-                newLed.Data.LEDNumber = i;
-                deviceLeds.Add(newLed);
-            }
+                WLEDControlDevice wled = new WLEDControlDevice();
+                wled.Name = controller.Name;
+                wled.DeviceType = DeviceTypes.LedStrip;
+                wled.Driver = this;
+                wled.Has2DSupport = false;
+                wled.ProductImage = (Bitmap)System.Drawing.Image.FromStream(imageStream);
+                wled.LedCount = controller.LedCount;
+                wled.Endpoint = new IPEndPoint(IPAddress.Parse(controller.IP), Int32.Parse(controller.Port));
 
-            wled.LEDs = deviceLeds.ToArray();
-            DeviceAdded?.Invoke(wled, new Events.DeviceChangeEventArgs(wled));
+                List<ControlDevice.LedUnit> deviceLeds = new List<ControlDevice.LedUnit>();
+                for (int i = 0; i < controller.LedCount; i++)
+                {
+                    ControlDevice.LedUnit newLed = new ControlDevice.LedUnit();
+                    newLed.Data = new ControlDevice.LEDData();
+                    newLed.Data.LEDNumber = i;
+                    deviceLeds.Add(newLed);
+                }
+
+                wled.LEDs = deviceLeds.ToArray();
+                DeviceAdded?.Invoke(wled, new Events.DeviceChangeEventArgs(wled));
+            }
         }
 
         public void Dispose()
@@ -114,7 +112,7 @@ namespace Driver.WLED
                 send_bytes.Add(b);
             }
 
-            socket.SendTo(send_bytes.ToArray(), wledDevice.Endpoint);
+            wledDevice.Socket.SendTo(send_bytes.ToArray(), wledDevice.Endpoint);
         }
 
         public void PutConfig<T>(T config) where T : SLSConfigData
@@ -124,7 +122,7 @@ namespace Driver.WLED
 
         public UserControl GetCustomConfig(ControlDevice controlDevice)
         {
-            var config = new WLEDConfig()
+            var config = new WLEDConfig(this)
             {
                 DataContext = configModel
             };
@@ -140,18 +138,6 @@ namespace Driver.WLED
         public void SetIsDirty(bool val)
         {
             configModel.DataIsDirty = val;
-
-            wled.Endpoint = new IPEndPoint(IPAddress.Parse(configModel.IP), Int32.Parse(configModel.Port));
-            List<ControlDevice.LedUnit> deviceLeds = new List<ControlDevice.LedUnit>();
-            for (int i = 0; i < configModel.LedCount; i++)
-            {
-                ControlDevice.LedUnit newLed = new ControlDevice.LedUnit();
-                newLed.Data = new ControlDevice.LEDData();
-                newLed.Data.LEDNumber = i;
-                deviceLeds.Add(newLed);
-            }
-
-            wled.LEDs = deviceLeds.ToArray();
         }
 
         public void SetColorProfile(ColorProfile value)
@@ -162,6 +148,7 @@ namespace Driver.WLED
         public class WLEDControlDevice : ControlDevice
         {
             public EndPoint Endpoint { get; set; }
+            public Socket Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             public int LedCount { get; set; }
         }
     }

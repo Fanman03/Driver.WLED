@@ -20,9 +20,16 @@ namespace Driver.WLED
     /// </summary>
     public partial class WLEDConfig : UserControl
     {
-        public WLEDConfig()
+        public WLEDDriver WledDriver;
+        public WLEDConfig(WLEDDriver driver)
         {
+            WledDriver = driver;
             InitializeComponent();
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            WledDriver.configModel.NewController();
         }
     }
 }
