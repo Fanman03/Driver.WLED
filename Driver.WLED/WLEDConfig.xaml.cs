@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,9 +28,14 @@ namespace Driver.WLED
             InitializeComponent();
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private void AddClick(object sender, RoutedEventArgs e)
         {
             WledDriver.AddController(WledDriver.configModel.NewController(IPBox.Text));
+        }
+
+        private void DeleteAllClick(object sender, RoutedEventArgs e)
+        {
+            WledDriver.configModel.Controllers = new ObservableCollection<WLEDConfigModel.WLEDController>();
         }
     }
 }

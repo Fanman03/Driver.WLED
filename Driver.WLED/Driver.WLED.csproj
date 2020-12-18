@@ -71,5 +71,9 @@
   <ItemGroup>
     <EmbeddedResource Include="WLED.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ESP32.png" />
+    <EmbeddedResource Include="ESP8266.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

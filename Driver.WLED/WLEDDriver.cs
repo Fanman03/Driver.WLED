@@ -21,11 +21,19 @@ namespace Driver.WLED
         public WLEDConfigModel configModel = new WLEDConfigModel();
 
         public static Assembly assembly = Assembly.GetExecutingAssembly();
-        public static Stream imageStream = assembly.GetManifestResourceStream("Driver.WLED.WLED.png");
+        public static Stream GenericStream = assembly.GetManifestResourceStream("Driver.WLED.WLED.png");
+        public static Stream Esp32Stream = assembly.GetManifestResourceStream("Driver.WLED.ESP32.png");
+        public static Stream Esp8266Stream = assembly.GetManifestResourceStream("Driver.WLED.ESP8266.png");
+        public List<WLEDControlDevice> deviceList = new List<WLEDControlDevice>();
 
 
-        
+
         public void Configure(DriverDetails driverDetails)
+        {
+            ConvertControllersToDevices();
+        }
+
+        public void ConvertControllersToDevices()
         {
             foreach (WLEDConfigModel.WLEDController controller in configModel.Controllers)
             {
@@ -40,8 +48,19 @@ namespace Driver.WLED
             wled.DeviceType = DeviceTypes.LedStrip;
             wled.Driver = this;
             wled.Has2DSupport = false;
-            wled.ProductImage = (Bitmap)System.Drawing.Image.FromStream(imageStream);
             wled.LedCount = controller.LedCount;
+            wled.ConnectedTo =controller.ControllerType.ToUpper();
+            if (wled.ConnectedTo == "ESP32")
+            {
+                wled.ProductImage = (Bitmap)System.Drawing.Image.FromStream(Esp32Stream);
+            } else if (wled.ConnectedTo == "ESP8266")
+            {
+                wled.ProductImage = (Bitmap)System.Drawing.Image.FromStream(Esp8266Stream);
+            }
+            else
+            {
+                wled.ProductImage = (Bitmap)System.Drawing.Image.FromStream(GenericStream);
+            }
             wled.Endpoint = new IPEndPoint(IPAddress.Parse(controller.IP), Int32.Parse(controller.Port));
 
             List<ControlDevice.LedUnit> deviceLeds = new List<ControlDevice.LedUnit>();
@@ -55,13 +74,18 @@ namespace Driver.WLED
 
             wled.LEDs = deviceLeds.ToArray();
             DeviceAdded?.Invoke(wled, new Events.DeviceChangeEventArgs(wled));
+            deviceList.Add(wled);
             var helloWorld = new List<byte>() { 0x02, 0xFF, 0x00, 0xFF, 0x00 };
             wled.Socket.SendTo(helloWorld.ToArray(), wled.Endpoint);
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            foreach (WLEDControlDevice device in deviceList)
+            {
+                var clear_bytes = new List<byte>() { 0x02, 0x01, 0x00, 0x00, 0xFF };
+                device.Socket.SendTo(clear_bytes.ToArray(), device.Endpoint);
+            }
         }
 
         public T GetConfig<T>() where T : SLSConfigData
@@ -124,6 +148,7 @@ namespace Driver.WLED
 
         public void PutConfig<T>(T config) where T : SLSConfigData
         {
+            ConvertControllersToDevices();
             this.configModel = config as WLEDConfigModel;
         }
 

@@ -8,10 +8,11 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="34"></RowDefinition>
+            <RowDefinition Height="34"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
-        <ListView ItemsSource="{Binding Controllers}">
+        <ListView Grid.Row="2" ItemsSource="{Binding Controllers}">
         <ListView.ItemTemplate>
             <DataTemplate>
             <Grid Margin="10" HorizontalAlignment="Center">
@@ -42,9 +43,10 @@
             </DataTemplate>
         </ListView.ItemTemplate>
     </ListView>
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <TextBox Name="IPBox" Width="100">6.9.6.9</TextBox>
-            <Button  Width="100" Click="ButtonBase_OnClick">Add Controller</Button>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4">
+            <TextBox Name="IPBox" Width="100" Margin="4,0">6.9.6.9</TextBox>
+            <Button  Width="100" Margin="4,0" Click="AddClick">Add Controller</Button>
         </StackPanel>
+        <Button Width="100" Margin="4,4" Grid.Row="1" Click="DeleteAllClick">Remove All</Button>
     </Grid>
 </UserControl>

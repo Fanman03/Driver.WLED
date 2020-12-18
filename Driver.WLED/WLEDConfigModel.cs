@@ -22,7 +22,7 @@ namespace Driver.WLED
             return newController;
         }
 
-        private ObservableCollection<WLEDController> controllers = new ObservableCollection<WLEDController>() {};
+        private ObservableCollection<WLEDController> controllers = new ObservableCollection<WLEDController>(){};
 
         public ObservableCollection<WLEDController> Controllers
         {
@@ -37,9 +37,17 @@ namespace Driver.WLED
         public class WLEDController
         {
             public string IP { get; set; }
-            public string Port { get; set; }
 
-            public int LedCount
+            public string Port
+            {
+                get
+                {
+                    return Info.udpport.ToString();
+                }
+                set {}
+            }
+
+            private WLEDApiInfo Info
             {
                 get
                 {
@@ -49,36 +57,43 @@ namespace Driver.WLED
                         using (var wc = new QuickClient())
                             jsonString = wc.DownloadString("http://" + IP + "/json/info");
                         var response = JsonConvert.DeserializeObject<WLEDApiInfo>(jsonString);
-                        return response.leds.count;
+                        return response;
                     }
                     catch
                     {
-                        return 10;
+                        WLEDApiInfo response = new WLEDApiInfo();
+                        response.leds.count = 10;
+                        response.name = "Unnamed WLED";
+                        response.arch = "Unknown";
+                        return response;
                     }
-
+                }
+            }
+            public int LedCount
+            {
+                get
+                {
+                 return Info.leds.count;
                 }
                 private set
                 {
                 }
             }
-
             public string Name
             {
                 get
                 {
-                    try
-                    {
-                        string jsonString;
-                        using (var wc = new QuickClient())
-                            jsonString = wc.DownloadString("http://" + IP + "/json/info");
-                        var response = JsonConvert.DeserializeObject<WLEDApiInfo>(jsonString);
-                        return response.name;
-                    }
-                    catch
-                    {
-                        return "Unnamed WLED";
-                    }
-
+                    return Info.name;
+                }
+                private set
+                {
+                }
+            }
+            public string ControllerType
+            {
+                get
+                {
+                    return Info.arch;
                 }
                 private set
                 {
