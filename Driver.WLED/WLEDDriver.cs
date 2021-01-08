@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Timers;
+using System.Windows;
 using System.Windows.Controls;
 using Newtonsoft.Json;
 using SimpleLed;
@@ -20,24 +22,35 @@ namespace Driver.WLED
         [JsonIgnore]
         public WLEDConfigModel configModel = new WLEDConfigModel();
 
+        public Timer myTimer = new Timer();
+
         public static Assembly assembly = Assembly.GetExecutingAssembly();
         public static Stream GenericStream = assembly.GetManifestResourceStream("Driver.WLED.WLED.png");
         public static Stream Esp32Stream = assembly.GetManifestResourceStream("Driver.WLED.ESP32.png");
         public static Stream Esp8266Stream = assembly.GetManifestResourceStream("Driver.WLED.ESP8266.png");
         public List<WLEDControlDevice> deviceList = new List<WLEDControlDevice>();
 
-
-
-        public void Configure(DriverDetails driverDetails)
+        public void RecheckControllers(object source, ElapsedEventArgs e)
         {
             ConvertControllersToDevices();
         }
 
+        public void Configure(DriverDetails driverDetails)
+        {
+            myTimer.Elapsed += new ElapsedEventHandler(RecheckControllers);
+            myTimer.Interval = 10000;
+            myTimer.Start();
+        }
+
         public void ConvertControllersToDevices()
         {
-            foreach (WLEDConfigModel.WLEDController controller in configModel.Controllers)
+            if (configModel.Controllers.Count > 0)
             {
-                AddController(controller);
+                foreach (WLEDConfigModel.WLEDController controller in configModel.Controllers)
+                {
+                    AddController(controller);
+                }
+                myTimer.Stop();
             }
         }
 
@@ -106,7 +119,7 @@ namespace Driver.WLED
                 Id = Guid.Parse("c7204793-c45a-4b8f-8290-56e66e4861a7"),
                 Author = "Fanman03",
                 Blurb = "Driver for controlling WLED controllers. WLED controller software by Aircoookie.",
-                CurrentVersion = new ReleaseNumber(1, 0, 0, 3),
+                CurrentVersion = new ReleaseNumber(1, 0, 0, 4),
                 GitHubLink = "https://github.com/SimpleLed/Driver.WLED",
                 IsPublicRelease = false,
             };
