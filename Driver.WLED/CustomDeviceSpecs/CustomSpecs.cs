@@ -15,16 +15,43 @@ namespace Driver.WLED.CustomDeviceSpecs
             this.MapperName = null;
         }
     }
-    public class Generic300LedStrip : WLEDCustomDeviceSpec
+    public class GenericLEDStrip : WLEDCustomDeviceSpec
     {
-        public Generic300LedStrip() : this(300) { }
+        public GenericLEDStrip() : this(300) { }
 
-        public Generic300LedStrip(int leds = 300)
+        public GenericLEDStrip(int leds = 300)
         {
             MadeByName = "Generic";
             LedCount = leds;
-            Name = "300 LED RGB Strip";
-            //PngData = ImageHelper.ReadImageStream("SPFan.png");
+            Name = "RGB LED Strip";
+            PngData = ImageHelper.ReadImageStream("LedStrip.png");
+        }
+    }
+    public class GenericLedBulbs : WLEDCustomDeviceSpec
+    {
+        public GenericLedBulbs() : this(100) { }
+
+        public GenericLedBulbs(int leds = 100)
+        {
+            MadeByName = "Generic";
+            LedCount = leds;
+            Name = "RGB LED Pixels";
+            PngData = ImageHelper.ReadImageStream("LedPixel.png");
+        }
+    }
+
+    public class GenericLedMatrix : WLEDCustomDeviceSpec
+    {
+        public GenericLedMatrix() : this(64) { }
+
+        public GenericLedMatrix(int leds = 64)
+        {
+            MadeByName = "Generic";
+            LedCount = leds;
+            Name = "RGB LED Matrix";
+            PngData = ImageHelper.ReadImageStream("LedMatrix.png");
+            GridWidth = 8;
+            GridHeight = 8;
         }
     }
 }

@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomDeviceSpecs\CustomSpecs.cs" />
+    <Compile Include="ImageHelper.cs" />
     <Compile Include="revision.cs" />
     <Compile Include="WLEDConfig.xaml.cs">
       <DependentUpon>WLEDConfig.xaml</DependentUpon>
@@ -78,5 +79,10 @@
     <EmbeddedResource Include="ESP8266.png" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="CustomDeviceImages\LedMatrix.png" />
+    <EmbeddedResource Include="CustomDeviceImages\LedPixel.png" />
+    <EmbeddedResource Include="CustomDeviceImages\LedStrip.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
