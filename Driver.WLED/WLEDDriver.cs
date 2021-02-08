@@ -64,7 +64,7 @@ namespace Driver.WLED
             wled.Has2DSupport = false;
             wled.LedCount = controller.LedCount;
             wled.ConnectedTo =controller.ControllerType.ToUpper();
-            wled.OverrideSupport = OverrideSupport.All;
+            wled.OverrideSupport = OverrideSupport.Self;
             if (wled.ConnectedTo == "ESP32")
             {
                 wled.ProductImage = (Bitmap)System.Drawing.Image.FromStream(Esp32Stream);

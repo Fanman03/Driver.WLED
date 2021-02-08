@@ -11,7 +11,7 @@ namespace Driver.WLED
     {
         internal static byte[] ReadImageStream(string name)
         {
-            Stream imgStream = System.Reflection.Assembly.GetAssembly(typeof(WLEDDriver)).GetManifestResourceStream("Driver.WLED.CustomDeviceImages" + name);
+            Stream imgStream = System.Reflection.Assembly.GetAssembly(typeof(WLEDDriver)).GetManifestResourceStream("Driver.WLED.CustomDeviceImages." + name);
             var temp = new byte[imgStream.Length];
             imgStream.Read(temp, 0, (int)imgStream.Length);
 
