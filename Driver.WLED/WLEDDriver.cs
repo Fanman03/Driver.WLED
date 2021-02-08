@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using Driver.WLED.CustomDeviceSpecs;
 using Newtonsoft.Json;
 using SimpleLed;
 
@@ -119,10 +120,49 @@ namespace Driver.WLED
                 Id = Guid.Parse("c7204793-c45a-4b8f-8290-56e66e4861a7"),
                 Author = "Fanman03",
                 Blurb = "Driver for controlling WLED controllers. WLED controller software by Aircoookie.",
-                CurrentVersion = new ReleaseNumber(1, 0, 0, 4),
+                CurrentVersion = new ReleaseNumber(1, 0, 1, AutoRevision.BuildRev.BuildRevision),
                 GitHubLink = "https://github.com/SimpleLed/Driver.WLED",
-                IsPublicRelease = false,
+                IsPublicRelease = true,
+                ProductCategory = ProductCategory.Hardware,
+                SetDeviceOverride = SetDeviceOverride,
+                GetCustomDeviceSpecifications = GetCustomDeviceSpecifications
             };
+        }
+
+        public void SetDeviceOverride(ControlDevice controlDevice, CustomDeviceSpecification deviceSpec)
+        {
+            WLEDControlDevice csd = controlDevice as WLEDControlDevice;
+
+            List<ControlDevice.LedUnit> leds = new List<ControlDevice.LedUnit>();
+
+            for (int i = 0; i < deviceSpec.LedCount; i++)
+            {
+                ControlDevice.LedUnit newLed = new ControlDevice.LedUnit();
+                newLed.Data = new ControlDevice.LEDData();
+                newLed.Data.LEDNumber = i;
+                leds.Add(newLed);
+            }
+
+            controlDevice.LEDs = leds.ToArray();
+        }
+
+        public List<CustomDeviceSpecification> GetCustomDeviceSpecifications()
+        {
+            var ttt = GetInheritedClasses(typeof(WLEDCustomDeviceSpec));
+
+            var r = new List<CustomDeviceSpecification>
+            {
+                // new CustomDevices.LT100(),
+                // new CustomDevices.MM800RGBPolaris()
+            };
+
+            foreach (Type type in ttt)
+            {
+                CustomDeviceSpecification x = (CustomDeviceSpecification)Activator.CreateInstance(type);
+                r.Add(x);
+            }
+
+            return r;
         }
 
         public void InterestedUSBChange(int VID, int PID, bool connected)
@@ -188,6 +228,11 @@ namespace Driver.WLED
         public void SetColorProfile(ColorProfile value)
         {
 
+        }
+        public static Type[] GetInheritedClasses(Type MyType)
+        {
+            //if you want the abstract classes drop the !TheType.IsAbstract but it is probably to instance so its a good idea to keep it.
+            return Assembly.GetAssembly(MyType).GetTypes().Where(TheType => TheType.IsClass && !TheType.IsAbstract && TheType.IsSubclassOf(MyType)).ToArray();
         }
 
         public class WLEDControlDevice : ControlDevice
